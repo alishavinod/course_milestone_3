@@ -9,11 +9,13 @@ help. You may build more than 2.</mark>
 
 Some ideas:
 
-- **A specialized tool:** a script the agent can call, for example one that reports which
-  endpoints the app does not serve yet, or one that summarizes a long log so the agent sees
-  only the errors.
-  - *What to change:* put it in `milestone-3-specs/` and tell the agent about it in
-    `/spec/README.md`.
+- **A specialized tool:** a new ability built into the agent itself, for example a command
+  that reports which endpoints the app does not serve yet, or one that shrinks long command
+  output so the agent sees only the errors.
+  - *What to change:* the agent's code in
+    [`mini-swe-agent/`](mini-swe-agent/src/minisweagent/agents/default.py) (for example,
+    `execute_actions()` runs each command and returns its output), and describe the tool in
+    the agent's prompts.
 - **Memory:** a way for the agent to keep track of what it has done and what is left.
   - *What to change:* tell the agent in `/spec/README.md` to keep a notes file, or have the
     agent code ([`mini-swe-agent/`](mini-swe-agent/src/minisweagent/agents/default.py)) add
