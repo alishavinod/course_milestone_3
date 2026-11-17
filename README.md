@@ -29,13 +29,14 @@ Some ideas:
 > [!TIP]
 > **What you can change:**
 >
-> - **`milestone-3-specs/`:** specs, checks, tools, memory files, or anything else the agent
->   uses during a run. It is copied into the agent's container as `/spec`, so a tool placed
->   here needs no Docker changes. A tool may install packages it needs when it runs.
+> - **The agent's code:** anything in [`mini-swe-agent/`](mini-swe-agent/), including tools
+>   built into the agent. It is installed into the agent's container on every run, so no
+>   Docker changes are needed. A tool may install packages it needs when it runs.
 > - **The agent's prompts:** in
->   [`agent_llm_config/mswea-openai-gpt-5.6-luna-no-reasoning.yaml`](tasks/slack-clone-course/course-staff-files/final_task/agent_llm_config/mswea-openai-gpt-5.6-luna-no-reasoning.yaml)
->   (but not the model or its settings).
-> - **The agent's code:** anything in [`mini-swe-agent/`](mini-swe-agent/).
+>   [`agent_llm_config/mswea-openai-gpt-5.6-luna-no-reasoning.yaml`](tasks/slack-clone-course/course-staff-files/final_task/agent_llm_config/mswea-openai-gpt-5.6-luna-no-reasoning.yaml),
+>   including how you describe your tools to the agent (but not the model or its settings).
+> - **`milestone-3-specs/`:** specs, checks, memory files, or other files the agent reads
+>   during a run. It is copied into the agent's container as `/spec`.
 >
 > Everything else stays as it is.
 
@@ -145,9 +146,9 @@ work is fine. Focus on your implementation choices, experiments and analysis:
 > - **Compare against a baseline:** <i>to show that your change helps, run the same setup with
 >   and without it, and keep everything else the same.</i>
 > - **Recall the role of `/spec/README.md`:** <i>it is the agent's entry point.</i>
->   - <i>It is where you tell the agent about anything you add, such as a tool it can call or
->     a memory file it should read and update. A tool the agent is never told about may never
->     be used.</i>
+>   - <i>It is where you tell the agent about files you add, such as a memory file it should
+>     read and update. Describe tools built into the agent in the agent's prompts instead. A
+>     tool the agent is never told about may never be used.</i>
 >   - <i>Make sure you are also instructing the agent to not edit the files in `/spec`.</i>
 > - **Time limit:** <i>recall that mini-swe-agent cuts off any single shell command after 30 seconds by
 >   default, so your checks must finish in under 30 seconds.</i>
