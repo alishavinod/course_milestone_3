@@ -4,6 +4,7 @@ or https://minimal-agent.com for a tutorial on the basic building principles.
 
 import json
 import logging
+import threading
 import time
 import traceback
 from pathlib import Path
@@ -50,6 +51,7 @@ class DefaultAgent:
         self.extra_template_vars = {}
         self.logger = logging.getLogger("agent")
         self.cost = 0.0
+        self._cost_lock = threading.Lock()
         self.n_calls = 0
         self.n_consecutive_format_errors = 0
         self._start_time = time.time()
@@ -94,6 +96,8 @@ class DefaultAgent:
         """Run step() until agent is finished. Returns dictionary with exit_status, submission keys."""
         self.extra_template_vars |= {"task": task, **kwargs}
         self.messages = []
+        if hasattr(self.env, "on_task"):
+            self.env.on_task(task, lambda: self.cost, self.ask_separately)
         self.add_messages(
             self.model.format_message(role="system", content=self._render_template(self.config.system_template)),
             self.model.format_message(role="user", content=self._render_template(self.config.instance_template)),
@@ -153,6 +157,14 @@ class DefaultAgent:
         except OSError:
             # Logging a bad request must never abort the run.
             self.logger.warning("Could not write format-error log to %s", path)
+
+    def ask_separately(self, messages: list[dict]) -> str:
+        """Ask the same model in a conversation of its own. The cost counts as this agent's cost."""
+        text, cost = self.model.complete(messages)
+        with self._cost_lock:
+            self.cost += cost
+            self.n_calls += 1
+        return text
 
     def step(self) -> list[dict]:
         """Query the LM, execute actions."""

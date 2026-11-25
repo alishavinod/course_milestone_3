@@ -109,6 +109,15 @@ class LitellmModel:
         }
         return message
 
+    def complete(self, messages: list[dict[str, str]], **kwargs) -> tuple[str, float]:
+        """Plain completion without action parsing. Returns the text and the cost."""
+        for attempt in retry(logger=logger, abort_exceptions=self.abort_exceptions):
+            with attempt:
+                response = self._query(self._prepare_messages_for_api(messages), **kwargs)
+        cost = self._calculate_cost(response)["cost"]
+        GLOBAL_MODEL_STATS.add(cost)
+        return response.choices[0].message.content or "", cost
+
     def _calculate_cost(self, response) -> dict[str, float]:
         # AIDEV-NOTE: opaque model names (e.g. Bedrock application-inference-profile ARNs) aren't
         # in litellm's price map, so completion_cost() raises "not mapped". If explicit per-token
